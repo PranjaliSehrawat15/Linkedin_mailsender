@@ -22,6 +22,23 @@ function initializeSchema() {
   const schemaPath = path.join(__dirname, 'schema.sql');
   const schema = fs.readFileSync(schemaPath, 'utf-8');
   db.exec(schema);
+  
+  // Seed settings from environment variables/config if empty
+  const config = require('../config/config');
+  const settings = db.prepare('SELECT * FROM settings WHERE id = 1').get();
+  if (!settings) {
+    db.prepare(`
+      INSERT INTO settings (id, linkedinEmail, linkedinPassword, gmailEmail, gmailAppPassword, userName)
+      VALUES (1, ?, ?, ?, ?, ?)
+    `).run(
+      config.linkedin.email || null,
+      config.linkedin.password || null,
+      config.gmail.email || null,
+      config.gmail.appPassword || null,
+      config.userName || 'Your Name'
+    );
+    logger.info('Database settings seeded from config/environment variables');
+  }
   logger.info('Database schema initialized');
 }
 

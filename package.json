@@ -1,0 +1,17 @@
+{
+  "name": "linkedin-job-automation",
+  "version": "1.0.0",
+  "description": "LinkedIn Job Outreach Automation Platform",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && node server.js",
+    "client": "cd client && npm run dev",
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install"
+  },
+  "dependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "keywords": ["linkedin", "automation", "job-search"],
+  "author": "",
+  "license": "ISC"
+}

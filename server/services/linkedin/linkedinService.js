@@ -411,9 +411,25 @@ async function searchAndExtract(keyword, credentials) {
     const loggedIn = await isLoggedIn();
 
     if (!loggedIn) {
-      logger.info('Session not valid or expired — logging in fresh...');
-      // Go back to search flow after fresh login
-      await loginToLinkedIn(credentials.email, credentials.password);
+      if (credentials.password.startsWith('LI_AT:')) {
+        logger.info('Detected LI_AT cookie in password field. Injecting to bypass login...');
+        const cookieValue = credentials.password.replace('LI_AT:', '').trim();
+        await context.addCookies([
+          { name: 'li_at', value: cookieValue, domain: '.linkedin.com', path: '/', secure: true, httpOnly: true, sameSite: 'None' },
+          { name: 'li_at', value: cookieValue, domain: 'www.linkedin.com', path: '/', secure: true, httpOnly: true, sameSite: 'None' }
+        ]);
+        
+        const cookieLoggedIn = await isLoggedIn();
+        if (!cookieLoggedIn) {
+          throw new Error('The provided LI_AT cookie is invalid or expired.');
+        }
+        logger.info('LI_AT cookie injected successfully. Logged in.');
+        await saveSession();
+      } else {
+        logger.info('Session not valid or expired — logging in fresh...');
+        // Go back to search flow after fresh login
+        await loginToLinkedIn(credentials.email, credentials.password);
+      }
     } else {
       logger.info('Reusing saved LinkedIn session — skipping login');
     }

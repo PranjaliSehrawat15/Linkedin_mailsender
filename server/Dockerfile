@@ -6,6 +6,9 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
+# Install build dependencies for compiling better-sqlite3 native binary
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential python3 && rm -rf /var/lib/apt/lists/*
+
 # Install dependencies (only production)
 RUN npm ci --only=production
 

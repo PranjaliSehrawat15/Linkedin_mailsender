@@ -55,8 +55,8 @@ async function launchBrowser() {
     }
 
     browser = await chromium.launch({
-      headless: false, // Headed mode so user can see and handle CAPTCHAs
-      slowMo: 50,
+      headless: process.env.HEADLESS === 'true' || config.nodeEnv === 'production', // Headless in prod, headed in dev
+      slowMo: config.nodeEnv === 'production' ? 0 : 50,
       args: [
         '--disable-blink-features=AutomationControlled',
         '--no-sandbox',

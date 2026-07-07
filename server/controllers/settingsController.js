@@ -12,6 +12,12 @@ exports.getSettings = (req, res) => {
       settings = db.prepare('SELECT * FROM settings WHERE id = 1').get();
     }
 
+    // Mask passwords for security before sending to frontend
+    if (settings) {
+      if (settings.linkedinPassword) settings.linkedinPassword = '••••••••';
+      if (settings.gmailAppPassword) settings.gmailAppPassword = '••••••••';
+    }
+
     res.json({ success: true, data: settings });
   } catch (error) {
     logger.error('Failed to fetch settings', { error: error.message });
